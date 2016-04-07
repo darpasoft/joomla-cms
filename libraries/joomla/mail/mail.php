@@ -300,7 +300,14 @@ class JMail extends PHPMailer
 	 */
 	public function addRecipient($recipient, $name = '')
 	{
-		$this->add($recipient, $name, 'addAddress');
+		try
+		{
+			$this->add($recipient, $name, 'addAddress');
+		}
+		catch (InvalidArgumentException $e)
+		{
+			// Ignore any errors
+		}
 
 		return $this;
 	}
@@ -320,7 +327,14 @@ class JMail extends PHPMailer
 		// If the carbon copy recipient is an array, add each recipient... otherwise just add the one
 		if (isset($cc))
 		{
-			$this->add($cc, $name, 'addCC');
+			try
+			{
+				$this->add($cc, $name, 'addCC');
+			}
+			catch (InvalidArgumentException $e)
+			{
+				// Ignore any errors
+			}
 		}
 
 		return $this;
@@ -341,7 +355,14 @@ class JMail extends PHPMailer
 		// If the blind carbon copy recipient is an array, add each recipient... otherwise just add the one
 		if (isset($bcc))
 		{
-			$this->add($bcc, $name, 'addBCC');
+			try
+			{
+				$this->add($bcc, $name, 'addBCC');
+			}
+			catch (InvalidArgumentException $e)
+			{
+				// Ignore any errors
+			}
 		}
 
 		return $this;
@@ -439,7 +460,14 @@ class JMail extends PHPMailer
 	 */
 	public function addReplyTo($replyto, $name = '')
 	{
-		$this->add($replyto, $name, 'addReplyTo');
+		try
+		{
+			$this->add($replyto, $name, 'addReplyTo');
+		}
+		catch (InvalidArgumentException $e)
+		{
+			// Ignore any errors
+		}
 
 		return $this;
 	}

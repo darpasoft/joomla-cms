@@ -173,18 +173,39 @@ class JMail extends PHPMailer
 			// If $from is an array we assume it has an address and a name
 			if (isset($from[2]))
 			{
-				// If it is an array with entries, use them
-				$this->setFrom(JMailHelper::cleanLine($from[0]), JMailHelper::cleanLine($from[1]), (bool) $from[2]);
+				try
+				{
+					// If it is an array with entries, use them
+					$this->setFrom(JMailHelper::cleanLine($from[0]), JMailHelper::cleanLine($from[1]), (bool) $from[2]);
+				}
+				catch (phpmailerException $e)
+				{
+					return false;
+				}
 			}
 			else
 			{
-				$this->setFrom(JMailHelper::cleanLine($from[0]), JMailHelper::cleanLine($from[1]));
+				try
+				{
+					$this->setFrom(JMailHelper::cleanLine($from[0]), JMailHelper::cleanLine($from[1]));
+				}
+				catch (phpmailerException $e)
+				{
+					return false;
+				}
 			}
 		}
 		elseif (is_string($from))
 		{
-			// If it is a string we assume it is just the address
-			$this->setFrom(JMailHelper::cleanLine($from));
+			try
+			{
+				// If it is a string we assume it is just the address
+				$this->setFrom(JMailHelper::cleanLine($from));
+			}
+			catch (phpmailerException $e)
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -306,7 +327,7 @@ class JMail extends PHPMailer
 		}
 		catch (InvalidArgumentException $e)
 		{
-			// Ignore any errors
+			return false;
 		}
 
 		return $this;
@@ -333,7 +354,7 @@ class JMail extends PHPMailer
 			}
 			catch (InvalidArgumentException $e)
 			{
-				// Ignore any errors
+				return false;
 			}
 		}
 
@@ -361,7 +382,7 @@ class JMail extends PHPMailer
 			}
 			catch (InvalidArgumentException $e)
 			{
-				// Ignore any errors
+				return false;
 			}
 		}
 
@@ -466,7 +487,7 @@ class JMail extends PHPMailer
 		}
 		catch (InvalidArgumentException $e)
 		{
-			// Ignore any errors
+			return false;
 		}
 
 		return $this;

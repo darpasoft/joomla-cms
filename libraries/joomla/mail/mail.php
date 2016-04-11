@@ -467,14 +467,7 @@ class JMail extends PHPMailer
 	 */
 	public function addReplyTo($replyto, $name = '')
 	{
-		try
-		{
-			$this->add($replyto, $name, 'addReplyTo');
-		}
-		catch (InvalidArgumentException $e)
-		{
-			return false;
-		}
+		$this->add($replyto, $name, 'addReplyTo');
 
 		return $this;
 	}

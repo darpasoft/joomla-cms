@@ -284,9 +284,16 @@ class JMail extends PHPMailer
 
 				foreach ($combined as $recipientEmail => $recipientName)
 				{
-					$recipientEmail = JMailHelper::cleanLine($recipientEmail);
-					$recipientName = JMailHelper::cleanLine($recipientName);
-					call_user_func('parent::' . $method, $recipientEmail, $recipientName);
+					try
+					{
+						$recipientEmail = JMailHelper::cleanLine($recipientEmail);
+						$recipientName = JMailHelper::cleanLine($recipientName);
+						call_user_func('parent::' . $method, $recipientEmail, $recipientName);
+					}
+					catch (phpmailerException $e)
+					{
+						return false;
+					}
 				}
 			}
 			else
@@ -321,14 +328,7 @@ class JMail extends PHPMailer
 	 */
 	public function addRecipient($recipient, $name = '')
 	{
-		try
-		{
-			$this->add($recipient, $name, 'addAddress');
-		}
-		catch (InvalidArgumentException $e)
-		{
-			return false;
-		}
+		$this->add($recipient, $name, 'addAddress');
 
 		return $this;
 	}
@@ -348,14 +348,7 @@ class JMail extends PHPMailer
 		// If the carbon copy recipient is an array, add each recipient... otherwise just add the one
 		if (isset($cc))
 		{
-			try
-			{
-				$this->add($cc, $name, 'addCC');
-			}
-			catch (InvalidArgumentException $e)
-			{
-				return false;
-			}
+			$this->add($cc, $name, 'addCC');
 		}
 
 		return $this;
@@ -376,14 +369,7 @@ class JMail extends PHPMailer
 		// If the blind carbon copy recipient is an array, add each recipient... otherwise just add the one
 		if (isset($bcc))
 		{
-			try
-			{
-				$this->add($bcc, $name, 'addBCC');
-			}
-			catch (InvalidArgumentException $e)
-			{
-				return false;
-			}
+			$this->add($bcc, $name, 'addBCC');
 		}
 
 		return $this;

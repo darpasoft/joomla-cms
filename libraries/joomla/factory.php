@@ -656,38 +656,45 @@ abstract class JFactory
 	 */
 	protected static function createMailer()
 	{
-		$conf = self::getConfig();
-
-		$smtpauth = ($conf->get('smtpauth') == 0) ? null : 1;
-		$smtpuser = $conf->get('smtpuser');
-		$smtppass = $conf->get('smtppass');
-		$smtphost = $conf->get('smtphost');
-		$smtpsecure = $conf->get('smtpsecure');
-		$smtpport = $conf->get('smtpport');
-		$mailfrom = $conf->get('mailfrom');
-		$fromname = $conf->get('fromname');
-		$mailer = $conf->get('mailer');
-
-		// Create a JMail object
-		$mail = JMail::getInstance();
-
-		// Set default sender without Reply-to
-		$mail->SetFrom(JMailHelper::cleanLine($mailfrom), JMailHelper::cleanLine($fromname), 0);
-
-		// Default mailer is to use PHP's mail function
-		switch ($mailer)
+		try
 		{
-			case 'smtp':
-				$mail->useSmtp($smtpauth, $smtphost, $smtpuser, $smtppass, $smtpsecure, $smtpport);
-				break;
+			$conf = self::getConfig();
 
-			case 'sendmail':
-				$mail->IsSendmail();
-				break;
+			$smtpauth = ($conf->get('smtpauth') == 0) ? null : 1;
+			$smtpuser = $conf->get('smtpuser');
+			$smtppass = $conf->get('smtppass');
+			$smtphost = $conf->get('smtphost');
+			$smtpsecure = $conf->get('smtpsecure');
+			$smtpport = $conf->get('smtpport');
+			$mailfrom = $conf->get('mailfrom');
+			$fromname = $conf->get('fromname');
+			$mailer = $conf->get('mailer');
 
-			default:
-				$mail->IsMail();
-				break;
+			// Create a JMail object
+			$mail = JMail::getInstance();
+
+			// Set default sender without Reply-to
+			$mail->SetFrom(JMailHelper::cleanLine($mailfrom), JMailHelper::cleanLine($fromname), 0);
+
+			// Default mailer is to use PHP's mail function
+			switch ($mailer)
+			{
+				case 'smtp':
+					$mail->useSmtp($smtpauth, $smtphost, $smtpuser, $smtppass, $smtpsecure, $smtpport);
+					break;
+
+				case 'sendmail':
+					$mail->IsSendmail();
+					break;
+
+				default:
+					$mail->IsMail();
+					break;
+			}
+		}
+		catch (phpmailerException $e)
+		{
+			// Don't do anything with the exception as it is ignored above here already
 		}
 
 		return $mail;

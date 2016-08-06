@@ -505,7 +505,7 @@ class ContentModelArticle extends JModelAdmin
 			$catid = CategoriesHelper::validateCategoryId($data['catid'], 'com_content');
 		}
 
-		// Save New Categoryg
+		// Save New Category
 		if ($catid == 0 && $this->canCreateCategory())
 		{
 			$table = array();
@@ -602,7 +602,6 @@ class ContentModelArticle extends JModelAdmin
 
 		if (parent::save($data))
 		{
-
 			if (isset($data['featured']))
 			{
 				$this->featured($this->getState($this->getName() . '.id'), $data['featured']);
@@ -823,5 +822,57 @@ class ContentModelArticle extends JModelAdmin
 	private function canCreateCategory()
 	{
 		return JFactory::getUser()->authorise('core.create', 'com_content');
+	}
+
+	/**
+	 * Method to store the token generated.
+	 *
+	 * @return  string  A new generated token.
+	 *
+	 * @since 3.7
+	 */
+	private function shareTokenGenerate()
+	{
+		jimport('joomla.user.helper');
+		$token = JUserHelper::genRandomPassword(16);
+
+		return $token;
+	}
+
+	/**
+	 * Method to store the token generated.
+	 *
+	 * @param   int  $articleId  The ID of the shared article.
+	 *
+	 * @return  string  The generated token.
+	 *
+	 * @since   3.7
+	 */
+	public function shareToken($articleId)
+	{
+		// Check if we have an existing token
+		$query = $this->_db->getQuery(true)
+			->select($this->_db->quoteName('sharetoken'))
+			->from($this->_db->quoteName('#__share_draft'))
+			->where($this->_db->quoteName('articleId') . '=' . (int) $articleId);
+		$this->_db->setQuery($query)->execute();
+
+		$token = $this->_db->loadResult();
+
+		if ($token === null)
+		{
+			// Generate the token
+			$token = $this->shareTokenGenerate();
+
+			// Store the new token
+			/** @var ContentTableShare $table */
+			$table = $this->getTable('Share', 'ContentTable');
+			$data = array('articleId' => $articleId, 'sharetoken' => $token);
+			$table->save($data);
+		}
+
+		$url = JUri::root() . 'index.php?option=com_content&view=article&id=' . $articleId . '&token=' . $token;
+
+		return JHtml::_('link', $url, $url);
 	}
 }

@@ -89,7 +89,7 @@ $isModal = $input->get('layout') == 'modal' ? true : false;
 $layout  = $isModal ? 'modal' : 'edit';
 $tmpl    = $isModal || $input->get('tmpl', '', 'cmd') === 'component' ? '&tmpl=component' : '';
 
-JHtml::_('script', 'system/share-uncompressed.js', false, true);
+JHtml::_('script', 'system/share.js', false, true);
 JFactory::getDocument()->addScriptDeclaration('
  	var sharebuttonUrl = "'
 		. JRoute::_(

@@ -15,7 +15,7 @@ function shareButton()
 
 	jQuery.ajax({
 		url: sharebuttonUrl,
-		dataType: 'json',
+		dataType: 'json'
 	})
 		.done(function (response) {
 			// Check if the request was successful

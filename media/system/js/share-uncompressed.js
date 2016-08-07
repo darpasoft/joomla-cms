@@ -30,10 +30,10 @@ function shareButton()
 			}
 
 			// Show the new share URL
-			var div = document.getElementById('shareId')
+			var div = document.getElementById('shareId');
 
 			// Set the text
-			div.innerHTML = response.data;
+			div.innerHTML = '<span class="icon-share"></span>' + response.data;
 
 			// Add the classes
 			div.className = 'alert alert-success';

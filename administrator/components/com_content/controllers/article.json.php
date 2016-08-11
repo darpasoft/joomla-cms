@@ -36,8 +36,8 @@ class ContentControllerArticle extends JControllerForm
 			$app->close();
 		}
 
-		$return = false;
-		$error = false;
+		$return  = false;
+		$error   = false;
 		$message = JText::_('COM_CONTENT_TOKEN_SAVED');
 
 		try

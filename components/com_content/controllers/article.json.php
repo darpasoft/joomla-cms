@@ -1,0 +1,69 @@
+<?php
+/**
+ * @package     Joomla.Administrator
+ * @subpackage  com_content
+ *
+ * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+defined('_JEXEC') or die;
+
+/**
+ * The article controller
+ *
+ * @package     Joomla.Administrator
+ * @subpackage  com_content
+ * @since       3.7
+ */
+class ContentControllerArticle extends JControllerLegacy
+{
+	/**
+	 * Method to generate and store share token.
+	 *
+	 * @return  boolean   True if token successfully stored, false otherwise and internal error is set.
+	 *
+	 * @since   3.7
+	 */
+	public function shareDraft()
+	{
+		$app    = JFactory::getApplication();
+
+		if (!JSession::checkToken('get'))
+		{
+			echo new JResponseJson(null, JText::_('JINVALID_TOKEN'), true);
+
+			$app->close();
+		}
+
+		$return  = false;
+		$error   = false;
+		$message = JText::_('COM_CONTENT_TOKEN_SAVED');
+
+		try
+		{
+			$articleId = $this->input->get('articleId', false, 'int');
+
+			if (false === $articleId)
+			{
+				throw new InvalidArgumentException(JText::_('COM_CONTENT_INVALID_ARTICLE_ID'));
+			}
+
+			// Base this model on the backend version.
+			require_once JPATH_ADMINISTRATOR . '/components/com_content/models/article.php';
+
+			// Get the model
+			$model = $this->getModel('Article', 'ContentModel');
+			$return = $model->shareToken($articleId);
+		}
+		catch (Exception $e)
+		{
+			$error = true;
+			$message = JText::_('COM_CONTENT_TOKEN_ERROR');
+		}
+
+		echo new JResponseJson($return, $message, $error);
+
+		$app->close();
+	}
+}

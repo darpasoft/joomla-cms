@@ -166,6 +166,7 @@ class ContentViewArticle extends JViewLegacy
 				JToolbarHelper::versions('com_content.article', $this->item->id);
 			}
 
+			JToolbarHelper::custom('article.shareDraft', 'share.png', 'share.png', 'COM_CONTENT_SHARE', false);
 			JToolbarHelper::cancel('article.cancel', 'JTOOLBAR_CLOSE');
 		}
 

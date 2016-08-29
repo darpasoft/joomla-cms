@@ -1,8 +1,8 @@
-CREATE TABLE [#__share_draft] (
-  [id]         [int] unsigned NOT NULL AUTO_INCREMENT,
-  [articleId]  [int] unsigned NOT NULL,
+CREATE TABLE [#__content_draft] (
+  [id]         [bigint] IDENTITY(1,1) NOT NULL,
+  [articleId]  [int] NOT NULL,
   [created]    [datetime]      NOT NULL,
-  [sharetoken] [nvarchar](255) NOT NULL,
+  [sharetoken] [nvarchar](16) NOT NULL,
   CONSTRAINT [PK_#__id] PRIMARY KEY CLUSTERED
     (
       [id] ASC

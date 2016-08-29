@@ -122,4 +122,50 @@ class ContentControllerArticles extends JControllerAdmin
 	{
 		return parent::getModel($name, $prefix, $config);
 	}
+
+	/**
+	 * Function that allows child controller access to model data
+	 * after the item has been deleted.
+	 *
+	 * @param   JModelLegacy  $model  The data model object.
+	 * @param   integer       $ids    The array of ids for items being deleted.
+	 *
+	 * @return  void
+	 *
+	 * @since   12.2
+	 */
+	protected function postDeleteHook(JModelLegacy $model, $ids = null)
+	{
+	}
+
+	/**
+	 * Method to generate and store share token.
+	 *
+	 * @return  boolean   True if token successfully stored, false otherwise and internal error is set.
+	 *
+	 * @since   _DEPLOY_VERSION_
+	 */
+	public function shareDraft()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		try
+		{
+			$ids = $this->input->get('cid', array(), 'array');
+
+			// Get the model
+			/** @var ContentModelArticle $model */
+			$model = $this->getModel();
+			$model->createShareDrafts($ids);
+
+			$message = JText::plural('COM_CONTENT_DRAFT_LINKS_N_ITEMS_SAVED', count($ids));
+		}
+		catch (Exception $e)
+		{
+			$message = JText::_('COM_CONTENT_DRAFT_LINK_ERROR');
+		}
+
+		$this->setRedirect(JRoute::_('index.php?option=com_content&view=articles', false), $message);
+	}
 }

@@ -50,8 +50,8 @@ $columns   = 10;
 						<th>
 							<?php echo JHtml::_('searchtools.sort', 'JGLOBAL_TITLE', 'c.title', $listDirn, $listOrder); ?>
 						</th>
-						<th width="1%" class="nowrap hidden-phone">
-							<?php echo JHtml::_('searchtools.sort', 'COM_CONTENT_FIELD_SHARETOKEN', 'a.sharetoken', $listDirn, $listOrder); ?>
+						<th width="50%" class="nowrap hidden-phone">
+							<?php echo JText::_('COM_CONTENT_FIELD_SHARETOKEN'); ?>
 						</th>
 						<th width="10%" class="nowrap hidden-phone">
 							<?php echo JHtml::_('searchtools.sort', 'JDATE', 'a.created', $listDirn, $listOrder); ?>
@@ -71,7 +71,6 @@ $columns   = 10;
 				<?php foreach ($this->items as $i => $item) :
 					$item->max_ordering = 0;
 					$ordering   = ($listOrder == 'a.ordering');
-					$canCreate  = $user->authorise('core.create',     'com_content.category.' . $item->catid);
 					$canEdit    = $user->authorise('core.edit',       'com_content.article.' . $item->id);
 					$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
 					$canEditOwn = $user->authorise('core.edit.own',   'com_content.article.' . $item->id) && $item->created_by == $userId;
@@ -79,35 +78,35 @@ $columns   = 10;
 					?>
 					<tr>
 						<td class="center">
-							<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+							<?php echo JHtml::_('grid.id', $i, $item->shareId); ?>
 						</td>
 						<td class="has-context">
 							<div class="pull-left break-word">
-								<?php
-									if ($canEdit || $canEditOwn)
-									{
+								<?php if ($item->checked_out) : ?>
+									<?php echo JHtml::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'articles.', $canCheckin); ?>
+								<?php endif; ?>
+								<?php if ($canEdit || $canEditOwn) : ?>
+									<?php
 										echo JHtml::_(
 											'link',
 											JRoute::_('index.php?option=com_content&task=article.edit&id=' . $item->id),
 											$this->escape($item->title),
 											array('class' => 'hasTooltip', 'title' => JText::_('JACTION_EDIT'))
 										);
-									}
-								?>
+									?>
+									<?php else : ?>
+										<span title="<?php echo JText::_('JFIELD_ALIAS_LABEL') . ' ' . $this->escape($item->alias); ?>"><?php echo $this->escape($item->title); ?></span>
+									<?php endif; ?>
 							</div>
 						</td>
-						<td class="small">
-							<?php
-							$url = JUri::root() . 'index.php?option=com_content&view=article&id=' . $item->articleId . '&token=' . $item->sharetoken;
-
-							echo JHtml::_('link', $url, $item->sharetoken);
-							?>
+						<td>
+							<?php echo JHtml::_('link', $item->link, $item->link); ?>
 						</td>
 						<td class="nowrap small hidden-phone">
 							<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_LC4')); ?>
 						</td>
 						<td class="hidden-phone">
-							<?php echo (int) $item->id; ?>
+							<?php echo (int) $item->shareId; ?>
 						</td>
 					</tr>
 					<?php endforeach; ?>

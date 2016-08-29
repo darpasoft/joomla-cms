@@ -90,15 +90,18 @@ $isModal = $input->get('layout') == 'modal' ? true : false;
 $layout  = $isModal ? 'modal' : 'edit';
 $tmpl    = $isModal || $input->get('tmpl', '', 'cmd') === 'component' ? '&tmpl=component' : '';
 
-JHtml::_('script', 'system/share.js', false, true);
-JFactory::getDocument()->addScriptDeclaration('
- 	var sharebuttonUrl = "'
+if ($this->item->id > 0)
+{
+	JHtml::_('script', 'system/share.js', false, true);
+	JFactory::getDocument()->addScriptDeclaration('
+	    var sharebuttonUrl = "'
 		. JRoute::_(
-			'index.php?option=com_content&task=article.shareDraft&articleId=' . $this->item->id . '&format=json&' . JSession::getFormToken() . '=1',
+			'index.php?option=com_content&task=article.shareDraft&articleId=' . $this->item->id . '&alias=' . $this->item->alias . '&format=json&' . JSession::getFormToken() . '=1',
 			false
 		)
-	. '";
-  ');
+		. '";
+	  ');
+}
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_content&layout=' . $layout . $tmpl . '&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="item-form" class="form-validate">

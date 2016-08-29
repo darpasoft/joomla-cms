@@ -7,6 +7,8 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+use Joomla\Utilities\ArrayHelper;
+
 defined('_JEXEC') or die;
 
 /**
@@ -54,7 +56,7 @@ class ContentControllerArticles extends JControllerAdmin
 		$ids    = $this->input->get('cid', array(), 'array');
 		$values = array('featured' => 1, 'unfeatured' => 0);
 		$task   = $this->getTask();
-		$value  = JArrayHelper::getValue($values, $task, 0, 'int');
+		$value  = ArrayHelper::getValue($values, $task, 0, 'int');
 
 		// Access checks.
 		foreach ($ids as $i => $id)
@@ -133,5 +135,36 @@ class ContentControllerArticles extends JControllerAdmin
 	 */
 	protected function postDeleteHook(JModelLegacy $model, $ids = null)
 	{
+	}
+
+	/**
+	 * Method to generate and store share token.
+	 *
+	 * @return  boolean   True if token successfully stored, false otherwise and internal error is set.
+	 *
+	 * @since   _DEPLOY_VERSION_
+	 */
+	public function shareDraft()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		try
+		{
+			$ids = $this->input->get('cid', array(), 'array');
+
+			// Get the model
+			/** @var ContentModelArticle $model */
+			$model = $this->getModel();
+			$model->createShareDrafts($ids);
+
+			$message = JText::plural('COM_CONTENT_DRAFT_LINKS_N_ITEMS_SAVED', count($ids));
+		}
+		catch (Exception $e)
+		{
+			$message = JText::_('COM_CONTENT_DRAFT_LINK_ERROR');
+		}
+
+		$this->setRedirect(JRoute::_('index.php?option=com_content&view=articles', false), $message);
 	}
 }

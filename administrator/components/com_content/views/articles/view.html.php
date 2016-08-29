@@ -28,6 +28,8 @@ class ContentViewArticles extends JViewLegacy
 	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
 	 *
 	 * @return  void
+	 *
+	 * @since   1.6
 	 */
 	public function display($tpl = null)
 	{
@@ -135,7 +137,6 @@ class ContentViewArticles extends JViewLegacy
 			&& $user->authorise('core.edit', 'com_content')
 			&& $user->authorise('core.edit.state', 'com_content'))
 		{
-
 			$title = JText::_('JTOOLBAR_BATCH');
 
 			// Instantiate a new JLayoutFile instance and render the batch button
@@ -144,6 +145,8 @@ class ContentViewArticles extends JViewLegacy
 			$dhtml = $layout->render(array('title' => $title));
 			$bar->appendButton('Custom', $dhtml, 'batch');
 		}
+
+		JToolbarHelper::custom('articles.shareDraft', 'share.png', 'share.png', 'COM_CONTENT_SHARE', false);
 
 		if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete'))
 		{

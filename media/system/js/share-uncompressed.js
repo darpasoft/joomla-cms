@@ -5,9 +5,9 @@
  */
 
 /**
- * Calls the sending process of the config class
+ * Calls the creation of a share URL
+ * @todo compress file
  */
-
 function shareButton()
 {
 	// Remove js messages, if they exist.
@@ -47,8 +47,11 @@ function shareButton()
 			}
 		})
 		.fail(function(xhr, ajaxOptions, thrownError) {
+			var messages = {
+				"error": [thrownError]
+			};
 
-			Joomla.renderMessages(xhr.responseText);
+			Joomla.renderMessages(messages);
 
 			window.scrollTo(0, 0);
 		});

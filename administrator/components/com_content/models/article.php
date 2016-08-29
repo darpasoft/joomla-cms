@@ -829,9 +829,9 @@ class ContentModelArticle extends JModelAdmin
 	 *
 	 * @return  string  A new generated token.
 	 *
-	 * @since 3.7
+	 * @since _DEPLOY_VERSION_
 	 */
-	private function shareTokenGenerate()
+	private function generateShareToken()
 	{
 		jimport('joomla.user.helper');
 		$token = JUserHelper::genRandomPassword(16);
@@ -842,37 +842,101 @@ class ContentModelArticle extends JModelAdmin
 	/**
 	 * Method to store the token generated.
 	 *
-	 * @param   int  $articleId  The ID of the shared article.
+	 * @param   int     $articleId  The ID of the shared article.
+	 * @param   string  $alias      The alias of the shared article.
 	 *
 	 * @return  string  The generated token.
 	 *
-	 * @since   3.7
+	 * @since   _DEPLOY_VERSION_
 	 */
-	public function shareToken($articleId)
+	public function createShareDraft($articleId, $alias)
 	{
-		// Check if we have an existing token
-		$query = $this->_db->getQuery(true)
-			->select($this->_db->quoteName('sharetoken'))
-			->from($this->_db->quoteName('#__share_draft'))
-			->where($this->_db->quoteName('articleId') . '=' . (int) $articleId);
-		$this->_db->setQuery($query)->execute();
+		/** @var ContentTableDraft $table */
+		$table = $this->getTable('Draft', 'ContentTable');
 
-		$token = $this->_db->loadResult();
+		$token = $table->loadToken($articleId);
 
 		if ($token === null)
 		{
 			// Generate the token
-			$token = $this->shareTokenGenerate();
+			$token = $this->generateShareToken();
 
 			// Store the new token
-			/** @var ContentTableShare $table */
-			$table = $this->getTable('Share', 'ContentTable');
 			$data = array('articleId' => $articleId, 'sharetoken' => $token);
 			$table->save($data);
 		}
 
 		$url = JUri::root() . 'index.php?option=com_content&view=article&id=' . $articleId . '&token=' . $token;
 
+		// Store the URL as a redirect link if possible
+		if (JPluginHelper::isEnabled('system', 'redirect') && JFactory::getConfig()->get('sef'))
+		{
+			JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_redirect/tables');
+			$redirectTable = $this->getTable('Link', 'RedirectTable');
+
+			// Make sure we have the table
+			if ($redirectTable)
+			{
+				// Get the nice URL
+				$redirectUrl = JUri::root() . 'index.php/' . $alias;
+
+				// Check for existing name
+				$query = $this->_db->getQuery(true)
+					->select($this->_db->quoteName('id'))
+					->from($this->_db->quoteName('#__redirect_links'))
+					->where($this->_db->quoteName('old_url') . ' = ' . $this->_db->quote($redirectUrl));
+				$this->_db->setQuery($query);
+
+				$rid = $this->_db->loadResult();
+
+				if (!$rid)
+				{
+					$data = array(
+						'old_url'   => $redirectUrl,
+						'new_url'   => $url,
+						'published' => 1,
+						'header'    => 303,
+					);
+
+					if ($redirectTable->save($data))
+					{
+						$url = $redirectUrl;
+					}
+				}
+				else
+				{
+					$url = $redirectUrl;
+				}
+			}
+		}
+
 		return JHtml::_('link', $url, $url);
+	}
+
+	/**
+	 * Create a share token for multiple articles.
+	 *
+	 * @param   array  $pks  An array of article IDs to create tokens for.
+	 *
+	 * @return  void
+	 *
+	 * @since   _DEPLOY_VERSION_
+	 */
+	public function createShareDrafts($pks)
+	{
+		// Sanitize the ids.
+		$pks = (array) $pks;
+		$pks = ArrayHelper::toInteger($pks);
+
+		foreach ($pks as $pk)
+		{
+			// Get the alias
+			$table = $this->getTable();
+
+			if ($table->load($pk))
+			{
+				$this->createShareDraft($pk, $table->get('alias'));
+			}
+		}
 	}
 }

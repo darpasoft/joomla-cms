@@ -1,10 +1,9 @@
-CREATE TABLE IF NOT EXISTS `#__share_draft` (
+CREATE TABLE IF NOT EXISTS `#__content_draft` (
   `id`         INT(10) UNSIGNED NOT NULL AUTO_INCREMENT
   COMMENT 'Primary Key',
   `articleId`  INT(10) UNSIGNED NOT NULL
-  COMMENT '#__content',
+  COMMENT 'article ID',
   `created`    DATETIME         NOT NULL,
-  `sharetoken` VARCHAR(255)     NOT NULL,
+  `sharetoken` VARCHAR(16)     NOT NULL,
   PRIMARY KEY (`id`)
-)
-  DEFAULT CHARSET = utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci COMMENT='Contains shareable draft tokens for content items';

@@ -29,7 +29,9 @@ class ContentModelShared extends JModelList
 		if (empty($config['filter_fields']))
 		{
 			$config['filter_fields'] = array(
-
+				'c.title',
+				'a.created',
+				'a.id',
 			);
 		}
 
@@ -46,7 +48,7 @@ class ContentModelShared extends JModelList
 	 *
 	 * @return  void
 	 *
-	 * @since   1.6
+	 * @since   _DEPLOY_VERSION_
 	 */
 	protected function populateState($ordering = 'a.id', $direction = 'desc')
 	{
@@ -64,7 +66,7 @@ class ContentModelShared extends JModelList
 	 *
 	 * @return  string  A store id.
 	 *
-	 * @since   1.6
+	 * @since   _DEPLOY_VERSION_
 	 */
 	protected function getStoreId($id = '')
 	{
@@ -79,39 +81,51 @@ class ContentModelShared extends JModelList
 	 *
 	 * @return  JDatabaseQuery
 	 *
-	 * @since   1.6
+	 * @since   _DEPLOY_VERSION_
 	 */
 	protected function getListQuery()
 	{
 		// Create a new query object.
-		$db = $this->getDbo();
-		$query = $db->getQuery(true);
-		$user = JFactory::getUser();
-
-		// Select the required fields from the table.
-		$query->select(
-			$this->getState(
-				'list.select',
-				'a.id, c.title, a.created, a.sharetoken, a.articleId'
+		$query = $this->_db->getQuery(true)
+			->select(
+				$this->_db->quoteName(
+					array(
+						'c.id',
+						'c.title',
+						'c.checked_out',
+						'c.checked_out_time',
+						'c.alias',
+						'a.created',
+						'a.sharetoken',
+						'a.articleId',
+					)
+				)
 			)
-		);
-		$query->from($db->quoteName('#__share_draft', 'a'));
+			->select($this->_db->quoteName('a.id', 'shareId'))
+			->from($this->_db->quoteName('#__content_draft', 'a'));
 
 		// Join over the language
-		$query->join('LEFT', $db->quoteName('#__content', 'c')
+		$query->join('LEFT', $this->_db->quoteName('#__content', 'c')
 			. ' ON '
-			. $db->quoteName('c.id') . '  = ' . $db->quoteName('a.articleId')
+			. $this->_db->quoteName('c.id') . '  = ' . $this->_db->quoteName('a.articleId')
 		);
+
+		// Join over the users for the checked out user.
+		$query->select($this->_db->quoteName('uc.name', 'editor'))
+			->leftJoin(
+				$this->_db->quoteName('#__users', 'uc')
+				. ' ON ' . $this->_db->quoteName('uc.id') . ' = ' . $this->_db->quoteName('c.checked_out')
+			);
 
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
 
 		if (!empty($search))
 		{
-			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+			$search = $this->_db->quote('%' . str_replace(' ', '%', $this->_db->escape(trim($search), true) . '%'));
 			$query->where('('
-				. $db->quoteName('c.title') . ' LIKE ' . $search
-				. ' OR ' . $db->quoteName('c.alias') . ' LIKE ' . $search
+				. $this->_db->quoteName('c.title') . ' LIKE ' . $search
+				. ' OR ' . $this->_db->quoteName('c.alias') . ' LIKE ' . $search
 				. ')'
 			);
 		}
@@ -120,8 +134,44 @@ class ContentModelShared extends JModelList
 		$orderCol = $this->state->get('list.ordering', 'a.id');
 		$orderDirn = $this->state->get('list.direction', 'desc');
 
-		$query->order($db->escape($orderCol . ' ' . $orderDirn));
+		$query->order($this->_db->escape($orderCol . ' ' . $orderDirn));
 
 		return $query;
+	}
+
+	/**
+	 * Method to get an array of data items.
+	 *
+	 * @return  mixed  An array of data items on success, false on failure.
+	 *
+	 * @since   _DEPLOY_VERSION_
+	 */
+	public function getItems()
+	{
+		$items = parent::getItems();
+
+		foreach ($items as $key => $item)
+		{
+			// Create the share link
+			$item->link = $url = JUri::root() . 'index.php?option=com_content&view=article&id=' . $item->articleId . '&token=' . $item->sharetoken;
+
+			// Check if the URL is stored as a redirect
+			$query = $this->_db->getQuery(true)
+				->select($this->_db->quoteName('old_url'))
+				->from($this->_db->quoteName('#__redirect_links'))
+				->where($this->_db->quoteName('new_url') . ' = ' . $this->_db->quote($item->link));
+			$this->_db->setQuery($query);
+
+			$redirectLink = $this->_db->loadResult();
+
+			if ($redirectLink)
+			{
+				$item->link = $redirectLink;
+			}
+
+			$items[$key] = $item;
+		}
+
+		return $items;
 	}
 }

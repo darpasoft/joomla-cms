@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
  *
  * @package     Joomla.Administrator
  * @subpackage  com_content
- * @since       3.7
+ * @since       _DEPLOY_VERSION_
  */
 class ContentControllerArticle extends JControllerForm
 {
@@ -23,7 +23,7 @@ class ContentControllerArticle extends JControllerForm
 	 *
 	 * @return  boolean   True if token successfully stored, false otherwise and internal error is set.
 	 *
-	 * @since   3.7
+	 * @since   _DEPLOY_VERSION_
 	 */
 	public function shareDraft()
 	{
@@ -38,11 +38,12 @@ class ContentControllerArticle extends JControllerForm
 
 		$return  = false;
 		$error   = false;
-		$message = JText::_('COM_CONTENT_TOKEN_SAVED');
+		$message = JText::plural('COM_CONTENT_DRAFT_LINKS_N_ITEMS_SAVED', 1);
 
 		try
 		{
 			$articleId = $this->input->get('articleId', false, 'int');
+			$alias     = $this->input->get('alias', false, 'cmd');
 
 			if (false === $articleId)
 			{
@@ -51,12 +52,12 @@ class ContentControllerArticle extends JControllerForm
 
 			// Get the model
 			$model = $this->getModel();
-			$return = $model->shareToken($articleId);
+			$return = $model->createShareDraft($articleId, $alias);
 		}
 		catch (Exception $e)
 		{
 			$error = true;
-			$message = JText::_('COM_CONTENT_TOKEN_ERROR');
+			$message = JText::_('COM_CONTENT_DRAFT_LINK_ERROR');
 		}
 
 		echo new JResponseJson($return, $message, $error);

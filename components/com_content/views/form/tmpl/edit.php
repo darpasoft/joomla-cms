@@ -43,15 +43,18 @@ JFactory::getDocument()->addScriptDeclaration("
 	}
 ");
 
-JHtml::_('script', 'system/share.js', false, true);
-JFactory::getDocument()->addScriptDeclaration('
- 	var sharebuttonUrl = "'
-	. JRoute::_(
-		'index.php?option=com_content&task=article.shareDraft&articleId=' . $this->item->id . '&format=json&' . JSession::getFormToken() . '=1',
-		false
-	)
-	. '";
-  ');
+if ($this->item->id > 0)
+{
+	JHtml::_('script', 'system/share.js', false, true);
+	JFactory::getDocument()->addScriptDeclaration('
+	    var sharebuttonUrl = "'
+		. JRoute::_(
+			'index.php?option=com_content&task=article.shareDraft&articleId=' . $this->item->id . '&alias=' . $this->item->alias . '&format=json&' . JSession::getFormToken() . '=1',
+			false
+		)
+		. '";
+	  ');
+}
 ?>
 <div class="edit item-page<?php echo $this->pageclass_sfx; ?>">
 	<?php if ($params->get('show_page_heading')) : ?>
@@ -79,11 +82,13 @@ JFactory::getDocument()->addScriptDeclaration('
 				<?php echo $this->form->getInput('contenthistory'); ?>
 			</div>
 			<?php endif; ?>
-			<div class="btn-group">
-				<button type="button" class="btn" onclick="Joomla.submitbutton('article.shareDraft')">
-					<span class="icon-share"></span><?php echo JText::_('COM_CONTENT_SHARE') ?>
-				</button>
-			</div>
+			<?php if ($this->item->id > 0) : ?>
+				<div class="btn-group">
+					<button type="button" class="btn" onclick="Joomla.submitbutton('article.shareDraft')">
+						<span class="icon-share"></span><?php echo JText::_('COM_CONTENT_SHARE') ?>
+					</button>
+				</div>
+			<?php endif; ?>
 		</div>
 		<div id="shareId"></div>
 		<fieldset>

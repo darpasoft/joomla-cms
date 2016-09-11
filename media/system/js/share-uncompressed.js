@@ -6,7 +6,6 @@
 
 /**
  * Calls the creation of a share URL
- * @todo compress file
  */
 function shareButton()
 {

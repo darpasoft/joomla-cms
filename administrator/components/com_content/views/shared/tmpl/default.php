@@ -83,7 +83,7 @@ $columns   = 10;
 						<td class="has-context">
 							<div class="pull-left break-word">
 								<?php if ($item->checked_out) : ?>
-									<?php echo JHtml::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'articles.', $canCheckin); ?>
+									<?php echo JHtml::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, '', false); ?>
 								<?php endif; ?>
 								<?php if ($canEdit || $canEditOwn) : ?>
 									<?php

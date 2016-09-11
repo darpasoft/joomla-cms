@@ -94,6 +94,7 @@ class ContentModelShared extends JModelList
 						'c.title',
 						'c.checked_out',
 						'c.checked_out_time',
+						'c.created_by',
 						'c.alias',
 						'a.created',
 						'a.sharetoken',

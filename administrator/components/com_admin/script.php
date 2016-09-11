@@ -1426,6 +1426,10 @@ class JoomlaInstallerScript
 			'/administrator/templates/isis/js/jquery.js',
 			'/administrator/templates/isis/js/bootstrap.min.js',
 			'/media/system/js/permissions.min.js',
+			'/libraries/platform.php',
+			// Joomla! 3.6.3
+			'/media/editors/codemirror/mode/jade/jade.js',
+			'/media/editors/codemirror/mode/jade/jade.min.js',
 			// Joomla __DEPLOY_VERSION__
 			'/libraries/joomla/user/authentication.php',
 		);
@@ -1524,6 +1528,8 @@ class JoomlaInstallerScript
 			// Joomla 3.6
 			'/libraries/simplepie/idn',
 			'/libraries/simplepie',
+			// Joomla! 3.6.3
+			'/media/editors/codemirror/mode/jade',
 		);
 
 		jimport('joomla.filesystem.file');

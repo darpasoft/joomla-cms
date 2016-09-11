@@ -114,6 +114,7 @@ class PlgContentVote extends JPlugin
 
 		if (empty($params) || !$params->get('show_vote', null))
 		{
+
 			return '';
 		}
 

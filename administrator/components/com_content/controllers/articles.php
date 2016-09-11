@@ -124,21 +124,6 @@ class ContentControllerArticles extends JControllerAdmin
 	}
 
 	/**
-	 * Function that allows child controller access to model data
-	 * after the item has been deleted.
-	 *
-	 * @param   JModelLegacy  $model  The data model object.
-	 * @param   integer       $ids    The array of ids for items being deleted.
-	 *
-	 * @return  void
-	 *
-	 * @since   12.2
-	 */
-	protected function postDeleteHook(JModelLegacy $model, $ids = null)
-	{
-	}
-
-	/**
 	 * Method to generate and store share token.
 	 *
 	 * @return  boolean   True if token successfully stored, false otherwise and internal error is set.
